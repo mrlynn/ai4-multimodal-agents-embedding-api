@@ -7,6 +7,7 @@ A serverless API for the MongoDB Multimodal PDF Agent workshop that provides sec
 **Production URLs:**
 - Embeddings: `https://workshop-embedding-api.vercel.app/api/embed`
 - AI Generation: `https://workshop-embedding-api.vercel.app/api/gemini`
+- Health Check: `https://workshop-embedding-api.vercel.app/api/health`
 
 ## 📋 API Documentation
 
@@ -88,6 +89,45 @@ POST /api/gemini
 
 **Rate Limits:** 30 requests per 15 minutes, max 3 per minute
 
+### Health Check Endpoint
+
+```
+GET /api/health
+```
+
+**Response Format:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-01-24T10:30:00.000Z",
+  "version": "1.1.0",
+  "services": {
+    "embedding": {
+      "available": true,
+      "endpoint": "/api/embed",
+      "provider": "Voyage AI"
+    },
+    "ai_generation": {
+      "available": true,
+      "endpoint": "/api/gemini", 
+      "provider": "Google Gemini"
+    }
+  },
+  "features": {
+    "rate_limiting": true,
+    "cors_enabled": true,
+    "function_calling": true
+  },
+  "uptime": 123.45
+}
+```
+
+**Status Values:**
+- `healthy` - All services operational
+- `partial` - Some services unavailable
+- `degraded` - No services available
+- `unhealthy` - System error
+
 ## 🔧 Quick Test
 
 **Test Embedding API:**
@@ -112,6 +152,11 @@ curl -X POST https://workshop-embedding-api.vercel.app/api/gemini \
       }
     ]
   }'
+```
+
+**Test Health Check:**
+```bash
+curl https://workshop-embedding-api.vercel.app/api/health
 ```
 
 ## 💻 Local Development
@@ -265,7 +310,8 @@ Monitor usage:
 ```
 ├── api/
 │   ├── embed.js              # Voyage AI embedding endpoint
-│   └── gemini.js             # Google Gemini AI endpoint
+│   ├── gemini.js             # Google Gemini AI endpoint
+│   └── health.js             # Health check endpoint
 ├── lib/
 │   └── rateLimiter.js        # Rate limiting middleware
 ├── test-local.js             # Local testing script
